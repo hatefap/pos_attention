@@ -15,7 +15,7 @@ class Bijenkhan():
 
     def sent_tag_gen(self, limit: int) -> Tuple[List, List]:
         """
-        if you look at Bigenkhan file you see two columns of data
+        if you look at Bijenkhan file you see two columns of data
         first column is POS tag, second column is word. this function just aggregate these two columns
         and returns a tuple like this ([[sent_1],[sent_2],[sent_3]...[sent_limit]], [[POS_1],[POS_2][POS_3]...[POS_limit]])
         """

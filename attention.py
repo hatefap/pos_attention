@@ -56,5 +56,5 @@ tags_sequence = tosequence(tags, tag2ind)
 
 sequence_max_length = max(len(s) for s in sentences_sequence)
 
-encoder_inputs = pad_sequences(sentences_sequence, maxlen=sequence_max_length, padding='post')
-encoder_targets = pad_sequences(sentences_sequence, maxlen=sequence_max_length, padding='post')
+encoder_inputs = pad_sequences(sentences_sequence, maxlen=sequence_max_length)
+encoder_targets = pad_sequences(sentences_sequence, maxlen=sequence_max_length)
