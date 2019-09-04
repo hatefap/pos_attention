@@ -39,10 +39,14 @@ class Bijenkhan():
 
                     # if we reach end of file in corpus
                     else:
-                        sents.append([w for w in cur_sent])
-                        tags.append([t for t in cur_tag])
-                        eof = True
-                        break
+                        if len(cur_sent) > 0:
+                            sents.append([w for w in cur_sent])
+                            tags.append([t for t in cur_tag])
+                            eof = True
+                            break
+                        else:
+                            eof = True
+                            break
                 yield sents, tags
 
     def get_vocab(self):
