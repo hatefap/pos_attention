@@ -1,6 +1,11 @@
+import numpy as np
+import tensorflow as tf
 from keras.preprocessing.sequence import pad_sequences
 
 WORD_EMBEDDING_DIM = 50
+NUMBER_OF_ENCODER_UNITS = 50
+NUMBER_OF_DECODER_UNITS = 50
+RANDOM_SEED = 101
 SEQUENCE_MAX_LENGTH = 50
 EPOCH = 100
 LEARNING_RATE = 0.01
@@ -58,3 +63,23 @@ sequence_max_length = max(len(s) for s in sentences_sequence)
 
 encoder_inputs = pad_sequences(sentences_sequence, maxlen=sequence_max_length)
 encoder_targets = pad_sequences(sentences_sequence, maxlen=sequence_max_length)
+
+# shuffle data
+np.random.seed(RANDOM_SEED)
+shuffle_indexes = np.random.permutation(np.arange(len(encoder_inputs)))
+encoder_inputs = encoder_inputs[shuffle_indexes]
+encoder_targets = encoder_targets[shuffle_indexes]
+
+# real sentence and target
+x = tf.placeholder(dtype=tf.int32, shape=(None, min([sequence_max_length, SEQUENCE_MAX_LENGTH])))
+y = tf.placeholder(dtype=tf.int32, shape=(None, min([sequence_max_length, SEQUENCE_MAX_LENGTH])))
+
+embedding_matrix = tf.Variable(tf.random_uniform([len(word2ind) + 1, WORD_EMBEDDING_DIM], minval=-1, maxval=1))
+embedding = tf.nn.embedding_lookup(embedding_matrix, x)
+
+print(f'shape of embedding: {embedding.get_shape()}')
+# shape of embedding: (?, 34, 50)
+
+cell = tf.keras.layers.GRU(NUMBER_OF_ENCODER_UNITS, return_sequences=True, return_state=True,
+                           recurrent_initializer='glorot_uniform')
+encoder = tf.keras.layers.Bidirectional(cell)(embedding)
