@@ -3,6 +3,7 @@ import tensorflow as tf
 from keras.preprocessing.sequence import pad_sequences
 
 WORD_EMBEDDING_DIM = 50
+NUMBER_OF_ATTENTION_NEURONS = 10
 NUMBER_OF_ENCODER_UNITS = 50
 NUMBER_OF_DECODER_UNITS = 50
 RANDOM_SEED = 101
@@ -83,3 +84,28 @@ print(f'shape of embedding: {embedding.get_shape()}')
 cell = tf.keras.layers.GRU(NUMBER_OF_ENCODER_UNITS, return_sequences=True, return_state=True,
                            recurrent_initializer='glorot_uniform')
 encoder = tf.keras.layers.Bidirectional(cell)(embedding)
+
+print(embedding_matrix.get_shape())
+
+repeat_vector = tf.keras.layers.RepeatVector(sequence_max_length)
+concat_vector = tf.keras.layers.Concatenate(axis=-1)
+
+
+def attention(h, st_1):
+    """
+    h -> [batch ,step = sequence_max_length, dim]
+    st_1 -> [NUMBER_OF_DECODER_UNITS]
+    """
+    batches = h.get_shape()[0]
+    st_1 = repeat_vector(st_1)  # st_1 -> [sequence_max_length, NUMBER_OF_DECODER_UNITS]
+    st_1 = tf.keras.layers.RepeatVector(batches)(st_1)  # -> [batch, sequence_max_length, NUMBER_OF_DECODER_UNITS]
+    o = concat_vector((h, st_1))  # -> [batch, sequence_max_length, NUMBER_OF_DECODER_UNITS + dim]
+    dense1 = tf.keras.layers.Dense(units=NUMBER_OF_ATTENTION_NEURONS, activation='tanh')(o)
+    dense2 = tf.keras.layers.Dense(units=1, activation='sigmoid')(dense1)
+
+    return dense2
+
+    for i in range(batches):
+        one_batch = h[i]
+        o1 = dense1(one_batch)
+        o2 = dense2(o1)
